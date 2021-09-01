@@ -16,4 +16,5 @@ The back test simulation is quite simple and further work could include the foll
     Selecting restrictions regarding the direction of positions taken.
     Allowing for strategies to include multiple indicators, either by adding all the rules for decision-making together,
         or by writing individual strategies from scratch for different permutations of indicators in use.
-    Adding a table with statistical insights to the back test performance
+    Adding a table with statistical insights to the back test performance.
+    Adding a buy and hold strategy as benchmark.
