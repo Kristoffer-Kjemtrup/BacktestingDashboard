@@ -82,6 +82,7 @@ def update_graph(symbol_value, period_value, interval_value, indicators, setting
     figure = FC.CreateMainFig(symbol_value, period_value, interval_value, indicators, settings)
     return figure
 
+
 @app.callback(
     Output('BackTest-symbol-graph', 'figure'),
     Input('BackTest-symbol', 'value'),
@@ -97,6 +98,7 @@ def update_graph(symbol_value, period_value, interval_value, indicator, settings
 
 @app.callback(
     Output('BackTest-symbol-graph', 'figure'),
+    Output('BackTest-return-graph', 'figure'),
     Output('BackTest-Backer', 'children'),
     Input('BackTest-Execute', 'n_clicks'),
     State('BackTest-symbol', 'value'),
@@ -113,12 +115,13 @@ def getBacker(n, symbol_value, period_value, interval_value, indicator, settings
 
     bt_val, bt_trades, bt_returns = BT.doBacktest(symbol_value, period_value, interval_value, settings,
                                                   indicator.split(), size, fee)
-    figure = FC.CreateMainFig(symbol_value, period_value, interval_value, indicator.split(), settings,
-                              bt_returns=bt_returns, bt_trades=bt_trades)
+    figures = FC.CreateMainFig(symbol_value, period_value, interval_value, indicator.split(), settings,
+                               bt_returns=bt_returns, bt_trades=bt_trades)
 
+    mainfig, returnfig = figures
     bt_val = f'Final portfolio value: {round(bt_val, 2):,}'
 
-    return figure, bt_val
+    return mainfig, returnfig, bt_val
 
 
 if __name__ == '__main__':
