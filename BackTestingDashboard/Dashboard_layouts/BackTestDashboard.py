@@ -82,5 +82,8 @@ layout = html.Div([
     ]),
     html.Button('Do Backtest', id='BackTest-Execute'),
     html.Div(id='BackTest-Backer'),
+    html.Br(),
+    dcc.Graph(id='BackTest-return-graph',
+              style={"height": "70vh"}),
 ])
 
