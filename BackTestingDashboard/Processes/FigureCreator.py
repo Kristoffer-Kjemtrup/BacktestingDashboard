@@ -17,8 +17,6 @@ def CreateMainFig(symbol_value, period_value, interval_value, indicators, settin
         data = DP.getTicker(symbol_value, period_value, interval_value, indicators)
 
     addrows = list(sorted(set(indicators).intersection(['MACD', 'sRSI', 'RSI'])))
-    if not type(bt_returns) is int:
-        addrows.append('Back test portfolio value')
 
     figure = make_subplots(rows=2 + len(addrows), cols=1, shared_xaxes=True,
                            vertical_spacing=0.03, subplot_titles=(['OHLC', 'Volume'] + addrows),
@@ -110,6 +108,16 @@ def CreateMainFig(symbol_value, period_value, interval_value, indicators, settin
                                                           for i in range(len(data.MACD_hist))]))],
                           rows=[3 + addrows.index('MACD')] * 3, cols=[1] * 3)
 
+    figure.update_xaxes(
+        rangeslider_visible=False,
+        rangebreaks=[
+            dict(bounds=[16.5, 9.5], pattern="hour") if interval_value < 5 else dict(bounds=["sat", "mon"]),
+            dict(bounds=["sat", "mon"])
+        ])
+
+    figure.update_layout(margin={'l': 40, 'b': 20, 't': 20, 'r': 0}, hovermode='closest')
+    figure.layout.xaxis.type = 'category'
+
     if not type(bt_returns) is int:
         if not type(bt_trades) is int and len(bt_trades) > 0:
             marker_data = DP.getBackTestStats(data, bt_trades)
@@ -118,16 +126,19 @@ def CreateMainFig(symbol_value, period_value, interval_value, indicators, settin
                              row=1, col=1)
 
         return_data = DP.getBackTestReturns(bt_returns)
-        figure.add_trace(go.Scatter(x=return_data.date, y=return_data.Return, name='Portfolio value'),
-                         row=3+addrows.index('Back test portfolio value'), col=1)
+        returnfig = make_subplots(rows=1, cols=1, shared_xaxes=True,
+                                  vertical_spacing=0.03, subplot_titles=(['Portfolio value']), row_width=([0.4]))
+        returnfig.add_trace(go.Scatter(x=return_data.date, y=return_data.Return, name='Portfolio value'), row=1, col=1)
 
-    figure.update_xaxes(
-        rangeslider_visible=False,
-        rangebreaks=[
-            dict(bounds=[16, 9.5], pattern="hour") if interval_value < 5 else dict(bounds=["sat", "mon"]),
-            dict(bounds=["sat", "mon"])
-        ])
-    figure.update_layout(margin={'l': 40, 'b': 20, 't': 20, 'r': 0}, hovermode='closest')
-    figure.layout.xaxis.type = 'category'
+        returnfig.update_xaxes(
+            rangeslider_visible=False,
+            rangebreaks=[
+                dict(bounds=[20.5, 9.5], pattern="hour") if interval_value < 5 else dict(bounds=["sat", "mon"]),
+                dict(bounds=["sat", "mon"])
+            ])
+
+        returnfig.update_layout(margin={'l': 40, 'b': 20, 't': 20, 'r': 0}, hovermode='closest')
+
+        return figure, returnfig
 
     return figure
