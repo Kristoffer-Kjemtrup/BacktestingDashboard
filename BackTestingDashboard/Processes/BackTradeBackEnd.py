@@ -1,7 +1,7 @@
 import pandas as pd
 import yfinance as yf
 import backtrader as bt
-import DataProcessing as DP
+from BackTestingDashboard.Processes import DataProcessing as DP
 import backtrader.analyzers as btanalyzers
 
 
@@ -162,7 +162,11 @@ def doBacktest(ticker, period, interval, settings, indicators, size, fee):
     cerebro.addstrategy(stratdict[indicators[0]], setting, size)
 
     cerebro.addanalyzer(btanalyzers.Transactions, _name='ransactions')
-    cerebro.addanalyzer(btanalyzers.TimeReturn, _name='Rturns')
+    if interval < 5:
+        res = [1, 5, 15, 30, 60][interval-1]
+        cerebro.addanalyzer(btanalyzers.TimeReturn, timeframe=bt.TimeFrame.Minutes, compression=1, _name='Rturns')
+    else:
+        cerebro.addanalyzer(btanalyzers.TimeReturn, _name='Rturns')
 
     result = cerebro.run()
     results = result[0]
